@@ -18,6 +18,13 @@ test('語彙表の禁止語を検出する', () => {
   assert.ok(ruleIds('設定が全プロジェクトに効く。').includes('jargon'));
   assert.ok(ruleIds('フックを効かせる。').includes('jargon'));
   assert.ok(ruleIds('包括的なテストを書く。').includes('jargon'));
+  assert.ok(ruleIds('追補チケットを作成する。').includes('jargon'));
+  assert.deepEqual(lintText('追加の対応チケットを作成する。'), []);
+  assert.deepEqual(lintText('別途対応する課題として登録する。'), []);
+  assert.deepEqual(lintText('「追補チケット」は使わない。'), []);
+  assert.ok(ruleIds('直下流を即 skip しない。').includes('jargon'));
+  assert.deepEqual(lintText('直接つながる次のステップを、その場でスキップしない。'), []);
+  assert.deepEqual(lintText('「直下流」は使わない。'), []);
   // 「効」を含む別語を巻き込まない。
   assert.ok(!ruleIds('規約の効果を測る。').includes('jargon'));
   assert.ok(!ruleIds('設定を有効にする。').includes('jargon'));
