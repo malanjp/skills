@@ -10,6 +10,11 @@ AI エージェントが出力する文章と、人が書いた原稿の推敲�
 規則の全文と標準出力フォーマットは `SKILL.md` にある。
 README に規則を複製しない。
 
+## Cursor 用パッケージ
+
+Cursor で使うパッケージは [`tired-dev-cursor`](../tired-dev-cursor/) である。
+このディレクトリは Claude Code 用である。
+
 ## インストール
 
 [skills CLI](https://github.com/vercel-labs/skills) を使う。

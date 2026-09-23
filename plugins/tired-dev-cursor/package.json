@@ -1,0 +1,11 @@
+{
+  "name": "tired-dev-cursor",
+  "version": "0.2.2",
+  "private": true,
+  "description": "Cursor 用。疲れたエンジニアが一読で理解できる日本語の技術文書を書くための規約",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test \"test/**/*.test.js\"",
+    "lint": "node ../tired-dev/tools/lint.js SKILL.md skills/tech-writing/SKILL.md rules/anchor.mdc rules/chat.mdc README.md"
+  }
+}

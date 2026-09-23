@@ -9,3 +9,5 @@ importers:
   .: {}
 
   plugins/tired-dev: {}
+
+  plugins/tired-dev-cursor: {}
