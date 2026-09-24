@@ -1,7 +1,7 @@
 {
   "name": "tired-dev",
-  "version": "0.2.2",
-  "description": "疲れたエンジニアが一読で理解できる日本語の技術文書を書くための規約。SessionStart で適用対象を通知し、UserPromptSubmit が共有文章の作成・推敲依頼を検出したときだけ要約を注入する。チャット返答の口調には干渉しない。規約の正本は SKILL.md。",
+  "version": "0.3.0",
+  "description": "疲れたエンジニアが一読で理解できる日本語の技術文書を書くための規約。SessionStart で適用対象を通知し、UserPromptSubmit が共有文章の作成・推敲依頼を検出したときだけ要約を注入する。PreToolUse が gh pr create / edit のタイトルと本文を検査し、違反があれば投稿を止める。チャット返答の口調には干渉しない。規約の正本は SKILL.md。",
   "author": {
     "name": "malanjp",
     "url": "https://github.com/malanjp"
@@ -42,6 +42,18 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/gate.js\"",
             "timeout": 5,
             "statusMessage": "tired-dev 判定中..."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pr-lint.js\"",
+            "timeout": 5
           }
         ]
       }
