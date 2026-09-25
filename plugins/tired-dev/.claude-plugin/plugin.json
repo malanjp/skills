@@ -1,6 +1,6 @@
 {
   "name": "tired-dev",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "疲れたエンジニアが一読で理解できる日本語の技術文書を書くための規約。SessionStart で適用対象を通知し、UserPromptSubmit が共有文章の作成・推敲依頼を検出したときだけ要約を注入する。PreToolUse が gh pr create / edit のタイトルと本文を検査し、違反があれば投稿を止める。チャット返答の口調には干渉しない。規約の正本は SKILL.md。",
   "author": {
     "name": "malanjp",

@@ -9,7 +9,7 @@
       "name": "tired-dev",
       "source": "./plugins/tired-dev",
       "description": "疲れたエンジニアが一読で理解できる日本語の技術文書を書くための規約。報告、Issue 起票文、PR の description、レビュー指摘、調査レポートに適用する。",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "author": {
         "name": "malanjp",
         "url": "https://github.com/malanjp"
