@@ -19,22 +19,22 @@ const { readInput, readAnchor } = require('./lib');
 const TRIGGER = new RegExp(
   [
     // 報告・調査
-    '報告', 'レポート', '調査結果', '障害', 'ポストモーテム', 'postmortem',
+    '報告', 'レポート', '調査結果', '障害', 'ポストモーテム', '\\bpostmortem\\b',
     '要約', 'サマリ', 'まとめて',
     // 提案・計画
-    '提案', '見直し', '改善案', '方針案', 'proposal',
+    '提案', '見直し', '改善案', '方針案', '\\bproposal\\b',
     // Issue・PR
-    'issue', 'イシュー', '起票', 'チケット',
-    'pr\\b', 'プルリク', 'プルリクエスト', 'レビュー', 'review',
+    '\\bissue\\b', 'イシュー', '起票', 'チケット',
+    '\\bpr\\b', 'プルリク', 'プルリクエスト', 'レビュー', '\\breview\\b',
     '受け入れ条件', 'acceptance criteria',
     // ドキュメント種別
-    'readme', 'adr', 'rfc', '仕様書', '設計書', 'デザインドック', 'design doc',
-    '手順書', 'runbook', 'ランブック', '議事録', 'ドキュメント', 'docs/',
-    'リリースノート', 'changelog', 'コミットメッセージ', 'commit message',
+    '\\breadme\\b', '\\badr\\b', '\\brfc\\b', '仕様書', '設計書', 'デザインドック', 'design doc',
+    '手順書', '\\brunbook\\b', 'ランブック', '議事録', 'ドキュメント', 'docs/',
+    'リリースノート', '\\bchangelog\\b', 'コミットメッセージ', 'commit message',
     // 編集・推敲の依頼
     '推敲', '校正', '添削', '清書', '読みやすく', '書き直', 'リライト',
     '言い回し', 'てにをは', '文章', '文面', '本文', '原稿',
-    'proofread', 'rewrite', 'polish', 'draft', '下書き',
+    '\\bproofread\\b', '\\brewrite\\b', '\\bpolish\\b', '\\bdraft\\b', '下書き',
   ].join('|'),
   'i'
 );

@@ -35,6 +35,8 @@ const MISS = [
   'この関数どういう意味？',
   'npm install して',
   'git status',
+  'quadrilateral の面積を計算して',
+  'badrequest の例外処理を追加して',
 ];
 
 test('共有文章の作成・推敲依頼で命中する', () => {

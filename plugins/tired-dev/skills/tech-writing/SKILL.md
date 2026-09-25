@@ -1,6 +1,6 @@
 ---
 name: tech-writing
-description: 疲れたエンジニアが一読で理解できる日本語の技術文書を書くための規約。報告、タスク仕様、Issue 起票文、コードレビュー指摘、調査結果、PR コメントに適用する。You MUST invoke this skill BEFORE writing or editing any Japanese text longer than 3 sentences that will be shared with humans — Linear の Issue 起票 / コメント / follow-up、GitHub の PR タイトル / description / レビュー返信、docs/ 配下の Markdown、ADR、README、仕様書、調査レポート、障害報告、リリースノートを含む。これらの文書を直す依頼、たとえば「推敲して」「校正して」「読みやすくして」「この文章どう？」proofread / rewrite in Japanese でも、スキル名が明示されなくても必ず参照する。エージェント自身が日本語の報告や指摘を出力する前にも自己適用し、結論を冒頭に置き、見出しを具体的にし、事実と仮説と対応方針を分離し、抽象的な比喩と誇張を避け、定量的に書き、そのまま実行できる検証コマンドと受け入れ条件を添える。お世辞、定型挨拶、実況中継は出さない。短い返答、単文の確認質問、コードやコマンドの出力には不要。エッセイ、小説、SNS 投稿など、技術報告以外の文章には適用しない。
+description: 疲れたエンジニアが一読で理解できる日本語の技術文書を書くための規約。報告、Issue、PR、レビュー指摘、調査結果、設計書、docs/ 配下の推敲に適用する。You MUST invoke this skill BEFORE writing or editing any Japanese text longer than 3 sentences that will be shared with humans (Linear issues/comments, GitHub PRs/reviews, design docs, README, reports). 推敲や校正の依頼（「推敲して」「読みやすくして」proofread / rewrite in Japanese）でも参照する。出力前に結論を冒頭に置き、見出しを具体的にし、事実と仮説を分離し、検証コマンドと受け入れ条件を添える。短い返答、単文の確認質問、コード出力には不要。エッセイ等の非技術文には適用しない。
 ---
 
 # tech-writing (プラグイン入口)
