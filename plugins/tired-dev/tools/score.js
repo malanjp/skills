@@ -66,6 +66,18 @@ const checks = {
     label: '定量的な記述',
     test: (text) => /\d+\s*(?:件|箇所|行|%|ms|秒|分|人|MB|GB)/.test(text),
   },
+  mermaid: {
+    label: '通信・処理フローの図解',
+    test: (text) => /```mermaid\n[\s\S]*?\n```/.test(text),
+  },
+  decision: {
+    label: '判断事項と推奨方針の対比',
+    test: (text) => /判断(?:事項|してほしい)|推奨(?:方針|案)/.test(text),
+  },
+  'verification-plan': {
+    label: '未検証事項と検証計画',
+    test: (text) => /検証計画|確認項目|検証手順|フォールバック|成立しない場合/.test(text),
+  },
 };
 
 function scoreText(text, expected) {

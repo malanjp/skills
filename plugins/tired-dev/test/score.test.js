@@ -38,3 +38,19 @@ test('テーブルのない文書では検出しない', () => {
   // 行頭がパイプでない行は 1 本目の正規表現で落ちる。
   assert.ok(!has('コマンドは `ls | grep foo` である。', 'table'));
 });
+
+test('mermaid ブロックを検出する', () => {
+  assert.ok(has('```mermaid\nsequenceDiagram\n  A->>B: hi\n```', 'mermaid'));
+  assert.ok(!has('```bash\nls -la\n```', 'mermaid'));
+});
+
+test('判断事項の対比を検出する', () => {
+  assert.ok(has('| 判断事項 | 推奨方針 | 理由 |', 'decision'));
+  assert.ok(has('判断してほしい事項は 3 件。推奨案は次のとおり。', 'decision'));
+});
+
+test('未検証事項と検証計画を検出する', () => {
+  assert.ok(has('検証計画: 確認項目と検証手順を定める', 'verification-plan'));
+  assert.ok(has('成立しない場合の対応方針 (フォールバック) を明記する', 'verification-plan'));
+});
+
