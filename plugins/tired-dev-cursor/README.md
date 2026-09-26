@@ -7,7 +7,8 @@ Claude Code 用の [`tired-dev`](../tired-dev/) ではない。
 スキル名は `tech-writing` のままである。
 呼び出すときは `/tech-writing` とする。
 
-正本は [`SKILL.md`](SKILL.md) にある。
+正本は Claude Code 用の [`../tired-dev/SKILL.md`](../tired-dev/SKILL.md) にある。
+このパッケージの [`SKILL.md`](SKILL.md) は正本と同一に保つ。
 要約は [`rules/anchor.mdc`](rules/anchor.mdc) にある。
 
 ## Cursor に入れる

@@ -14,6 +14,8 @@ README に規則を複製しない。
 
 Cursor で使うパッケージは [`tired-dev-cursor`](../tired-dev-cursor/) である。
 このディレクトリは Claude Code 用である。
+このディレクトリの `SKILL.md` が規約の正本である。
+Cursor 用パッケージの `SKILL.md` と要約は、正本と同一に保つ。
 
 ## インストール
 
