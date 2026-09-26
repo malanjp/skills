@@ -17,6 +17,26 @@ Cursor で使うパッケージは [`tired-dev-cursor`](../tired-dev-cursor/) �
 このディレクトリの `SKILL.md` が規約の正本である。
 Cursor 用パッケージの `SKILL.md` と要約は、正本と同一に保つ。
 
+## OpenCode で使う
+
+OpenCode V2 では [`opencode/`](opencode/) のプラグインが、スキル登録、共有文章の作成依頼の検出、PR の投稿前検査をまとめて提供する。
+スキル名は `tech-writing` で、`SKILL.md` を正本としてプラグインが登録する。
+
+`~/.config/opencode/opencode.json` の `plugins` に絶対パスを追加する。
+V2 の設定キーは `plugins` である。
+V1 から引き継いだ設定が `plugin`（単数形）を使っている場合は、その配列に足してもよい。
+追加したら OpenCode を再起動するか `opencode reload` を実行する。
+
+```json
+{
+  "plugins": ["/path/to/skills/plugins/tired-dev/opencode"]
+}
+```
+
+検査は Claude Code のフックと同じ `hooks/gate-lib.js` と `hooks/pr-lint-lib.js` を使う。
+OpenCode に `SessionStart` はないため、初回の対象プロンプトで規約を注入する。
+環境変数 `TIRED_DEV_PR_LINT` と `TIRED_DEV_CHAT` は Claude Code と同じ意味で働く。
+
 ## インストール
 
 [skills CLI](https://github.com/vercel-labs/skills) を使う。
