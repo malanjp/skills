@@ -43,9 +43,9 @@ function isGateHit(prompt) {
 // 同一セッションの 2 回目以降に出す 1 行のリマインダ。
 function reminderLine() {
   return (
-    '共有される文章を書く場合は tired-dev:tech-writing の規約を適用する。結論を冒頭に置き、' +
-    '事実と仮説と対応方針を分け、定量的に書き、そのまま実行できる検証コマンドと' +
-    `受け入れ条件を添える。詳細は ${path.join(ROOT, 'SKILL.md')} にある。`
+    '共有される文章は、tired-dev:tech-writing の規約に従い、です・ます調で書いてください。結論を冒頭に置き、' +
+    '事実と仮説と対応方針を分け、定量的に書き、' +
+    `必要な検証手順と完了条件を添えてください。規約の全文は ${path.join(ROOT, 'SKILL.md')} にあります。`
   );
 }
 
@@ -54,10 +54,10 @@ function firstHitInjection() {
   const anchor = readRule('anchor.md');
   if (!anchor) return '';
   return (
-    'このプロンプトは日本語の文章作成または推敲を含む可能性がある。\n' +
+    'このプロンプトは日本語の文章作成または推敲を含む可能性があります。\n' +
     'Issue、PR、docs、レビュー指摘、調査レポートなど共有される本文を書く場合は、\n' +
-    '以下の規約を適用する。短いチャット返答には適用しない。\n' +
-    `規約の正本は ${path.join(ROOT, 'SKILL.md')} にある。\n\n` +
+    '以下の規約を適用してください。短いチャット返答には適用しません。\n' +
+    `規約の全文は ${path.join(ROOT, 'SKILL.md')} にあります。\n\n` +
     anchor
   );
 }

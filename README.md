@@ -1,77 +1,107 @@
 # malanjp/skills
 
-malanjp が使うエージェント用のプラグインとスキルを置くリポジトリ。
-Claude Code 用と Cursor 用は別のディレクトリである。
+疲れ切った同僚が、読み返さずに理解して次の行動を選べる技術文書を目指すスキル集です。
+現在は、日本語の Issue・PR・レビュー指摘・調査報告を書くための `tech-writing` を収録しています。
 
-## 収録プラグイン
+新しい文書の作成にも、既存の原稿の推敲にも使えます。
+[規約とテンプレート](plugins/tired-dev/SKILL.md)、[記入例](plugins/tired-dev/eval/template-examples.md)で、文章の組み立て方を確認できます。
 
-| プラグイン | 対象 | 収録スキル | 内容 |
-|---|---|---|---|
-| [`tired-dev`](plugins/tired-dev/) | Claude Code, OpenCode | `tech-writing` | 疲れたエンジニアが一読で理解できる日本語の技術文書を書くための規約 |
-| [`tired-dev-cursor`](plugins/tired-dev-cursor/) | Cursor | `tech-writing` | 同じ規約の Cursor 用パッケージ。スキル名は `tech-writing` のまま |
+## 使うエージェントに合わせて導入します
 
-## Claude Code に導入する
+文章の規約は共通です。規約を読み込ませる仕組みと、PR の投稿前検査は環境によって異なります。
 
-マーケットプレイスとして追加し、使うプラグインだけを個別に入れる。
+| 環境 | 導入するもの | 利用できる機能 |
+|---|---|---|
+| Claude Code | `tired-dev` プラグイン | スキル、文章作成の依頼に応じた規約の提示、PR の投稿前検査 |
+| OpenCode V2 | `tired-dev` のローカルプラグイン | スキルの登録、文章作成の依頼に応じた規約の提示、PR の投稿前検査 |
+| Cursor | `tired-dev-cursor` プラグイン | スキルと規約の要約 |
 
-```
+### Claude Code
+
+Claude Code で、マーケットプレイスとプラグインを追加します。
+
+```text
 /plugin marketplace add malanjp/skills
 /plugin install tired-dev@malanjp
 ```
 
-各プラグインの詳細と、プラグインを使わずスキルとして導入する手順は、
-それぞれのディレクトリの README に書いてある。
+明示的に使う場合は、`/tired-dev:tech-writing` を呼び出して原稿や依頼を渡します。
+[スキルだけの導入や動作の設定](plugins/tired-dev/README.md)も選べます。
 
-## Cursor に導入する
+### OpenCode V2
 
-Cursor 用のプラグイン名は `tired-dev-cursor` である。
-Claude Code 用の `tired-dev` ではない。
-スキル名は `tech-writing`。呼び出すときは `/tech-writing` とする。
+このリポジトリをローカルに置き、`plugins/tired-dev/opencode` の絶対パスを設定します。
+プラグインはリポジトリの規約を直接読むため、配置したディレクトリを残して使います。
 
-Dashboard の Plugins で Team Marketplaces を開き、Import from Repo にこのリポジトリを指定する。
-追加するプラグインは `tired-dev-cursor` である。
-Cloud Agents へ常時入れる場合は、配布を Required にする。
+任意の作業ディレクトリで実行します。取得済みの場合は、そのリポジトリを使えます。
 
-Customize から入れる場合は、From GitHub Repository で同じリポジトリを指定する。
+```bash
+git clone https://github.com/malanjp/skills.git
+cd skills
+pwd
+```
 
-## OpenCode に導入する
-
-OpenCode V2 はスキルとプラグインを別々に読み込む。
-`tired-dev` は両方を提供する。
-プラグイン [`plugins/tired-dev/opencode`](plugins/tired-dev/opencode/) が、スキルの登録、共有文章の作成依頼の検出、`gh pr create` と `gh pr edit` の投稿前検査を行う。
-
-`~/.config/opencode/opencode.json` の `plugins` にこのディレクトリの絶対パスを追加する。
+`~/.config/opencode/opencode.json` の `plugins` 配列にパスを追加します。
+次の `/absolute/path/to/skills` は、`pwd` が表示したパスに置き換えてください。既存の設定やプラグインは残します。
 
 ```json
 {
-  "$schema": "https://opencode.ai/config.json",
-  "plugins": ["/path/to/skills/plugins/tired-dev/opencode"]
+  "plugins": ["/absolute/path/to/skills/plugins/tired-dev/opencode"]
 }
 ```
 
-V2 の設定キーは `plugins` である。
-V1 から引き継いだ設定が `plugin`（単数形）を使っている場合は、その配列に足してもよい。
-追加したら OpenCode を再起動するか `opencode reload` を実行する。
-プラグインが `SKILL.md` からスキルを登録するため、スキルディレクトリへ別途コピーしなくてよい。
+V1 形式の設定を引き継ぎ、`plugin`（単数形）を使っている場合は、その配列に追加します。
+追加後に OpenCode を再起動するか、次を実行します。
 
-スキルだけを使う場合は、[`plugins/tired-dev/SKILL.md`](plugins/tired-dev/SKILL.md) を `~/.config/opencode/skills/tech-writing/SKILL.md` へコピーする。
+```bash
+opencode reload
+opencode plugin list
+```
 
-Claude Code の `SessionStart` に相当する通知はない。
-それ以外のゲートと PR 検査は Claude Code と同じ判定を使う。
-環境変数 `TIRED_DEV_PR_LINT` と `TIRED_DEV_CHAT` も同じ意味で働く。
+一覧に `tired-dev` が表示されることを確認してください。
+プラグインが `tech-writing` を登録するため、スキルの手動コピーは不要です。
+[動作と環境変数の説明](plugins/tired-dev/README.md)に、Claude Code 版との違いを記載しています。
 
-## 開発
+### Cursor
 
-pnpm のワークスペースとして管理する。
-ルートで実行すると `plugins/` 配下の全プラグインに適用される。
+Cursor には `tired-dev-cursor` を追加します。
+
+1. Dashboard の Plugins から Team Marketplaces を開きます。
+2. Import from Repo に `https://github.com/malanjp/skills` を指定します。
+3. `tired-dev-cursor` を追加します。
+
+導入後は `/tech-writing` で呼び出せます。
+Customize から追加する方法や Cloud Agents への配布は、[Cursor 版の README](plugins/tired-dev-cursor/README.md)を参照してください。
+
+## 原稿と、読者にしてほしいことを渡します
+
+たとえば、次のように依頼します。
+
+```text
+この調査報告を、担当者が次の確認に着手できる形に推敲してください。
+確認済みの事実と仮説を分け、判断に必要な根拠を近くに置いてください。
+
+［原稿を貼る］
+```
+
+対象は、仕事で共有する技術文書です。短いチャット返答や、記事・エッセイには文書の形式を強制しません。
+
+## 変更後にテストと規約チェックを実行します
+
+Node.js と pnpm を用意し、リポジトリルートで実行します。
 
 ```bash
 pnpm install
-pnpm test    # 全プラグインのテスト
-pnpm lint    # 全プラグインの規約チェック
+pnpm test
+pnpm lint
 ```
 
-個別のプラグインだけを動かす場合は、そのディレクトリへ移動して同じコマンドを実行する。
+ルートのコマンドは、両パッケージのテストと規約チェックを実行します。
+個別に確認する場合は、対象の `plugins/` 配下へ移動して同じコマンドを使います。
+
+文章の読み心地は自動チェックだけでは判定できません。
+[記入例](plugins/tired-dev/eval/template-examples.md)を読み、結論・根拠・確認方法を探して戻る箇所がないか確認してください。
+[生成結果を比較する手順](plugins/tired-dev/README.md#規約ありなしの生成結果を比較します)も用意しています。
 
 ## ライセンス
 

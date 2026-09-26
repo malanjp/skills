@@ -15,6 +15,11 @@ function ruleIds(text) {
 }
 
 test('語彙表の禁止語を検出する', () => {
+  assert.ok(ruleIds('規約の正本を参照してください。').includes('jargon'));
+  assert.deepEqual(lintText('規約の全文を参照してください。'), []);
+  assert.deepEqual(lintText('規約の管理元を更新します。'), []);
+  assert.deepEqual(lintText('共通の定義を使います。'), []);
+  assert.deepEqual(lintText('「正本」は文脈に合わせて言い換えます。'), []);
   assert.ok(ruleIds('設定が全プロジェクトに効く。').includes('jargon'));
   assert.ok(ruleIds('フックを効かせる。').includes('jargon'));
   assert.ok(ruleIds('包括的なテストを書く。').includes('jargon'));

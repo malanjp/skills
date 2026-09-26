@@ -2,7 +2,7 @@
 //
 // 版番号は package.json、プラグインマニフェスト、マーケットプレイスの 3 種に現れる。
 // マーケットプレイスの版だけ古いまま残ると、導入時に古い版が配られる。
-// スキル説明文は正本 SKILL.md と各パッケージの入口 SKILL.md に現れる。
+// スキル説明文は管理元の SKILL.md と各パッケージの入口 SKILL.md に現れる。
 // 説明文がずれると、スキルの起動条件がパッケージごとに変わる。
 
 const test = require('node:test');
@@ -58,7 +58,7 @@ test('版番号は package.json とプラグインマニフェストとマーケ
   }
 });
 
-test('スキル説明文は正本 SKILL.md と各入口で一致する', () => {
+test('スキル説明文は管理元の SKILL.md と各入口で一致する', () => {
   const canonical = frontmatterField(path.join(CLAUDE_DIR, 'SKILL.md'), 'description');
   const entries = [
     path.join(CLAUDE_DIR, 'skills', 'tech-writing', 'SKILL.md'),
@@ -66,6 +66,6 @@ test('スキル説明文は正本 SKILL.md と各入口で一致する', () => {
   ];
 
   for (const entry of entries) {
-    assert.equal(frontmatterField(entry, 'description'), canonical, `${entry} の description が正本と違う`);
+    assert.equal(frontmatterField(entry, 'description'), canonical, `${entry} の description が管理元と違う`);
   }
 });

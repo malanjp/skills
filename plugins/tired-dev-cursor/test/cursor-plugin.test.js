@@ -1,5 +1,5 @@
 // Cursor プラグインが、Claude 用 tired-dev と別パッケージだと分かることを検査する。
-// スキル名 tech-writing は変えない。規約本文は tired-dev の正本と一致させる。
+// スキル名 tech-writing は変えない。規約本文は管理元の tired-dev と一致させる。
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -122,7 +122,7 @@ test('プラグインマニフェストは Cursor 用だと分かり、スキル
   );
 });
 
-test('Cursor 向け規約の本文は Claude 用の正本と一致する', () => {
+test('Cursor 向け規約の本文は管理元の tired-dev と一致する', () => {
   const pairs = [
     ['anchor.md', 'anchor.mdc', 'false'],
     ['chat.md', 'chat.mdc', 'false'],

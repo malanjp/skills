@@ -60,7 +60,7 @@ export default {
     return {}
   },
   async setup(ctx) {
-    // スキル tech-writing を登録する。SKILL.md が正本で、ここから読む。
+    // スキル tech-writing を登録する。SKILL.md から規約の全文を読む。
     const skillPath = path.join(PLUGIN_DIR, "..", "SKILL.md")
     const rawSkill = fs.readFileSync(skillPath, "utf8")
     const skill = {

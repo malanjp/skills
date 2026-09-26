@@ -108,11 +108,11 @@ test('プロンプトが空、または欠落していても落ちない', () =>
   assert.equal(runHook('gate', {}, dir), '');
 });
 
-test('SessionStart は適用対象と正本のパスを通知する', () => {
+test('SessionStart は適用対象と規約の全文のパスを通知する', () => {
   const dir = makeConfigDir();
   const out = runHook('activate', {}, dir);
   assert.ok(out.startsWith('tired-dev:tech-writing 有効。'), '通知がスキル名から始まっていない');
-  assert.ok(out.includes('SKILL.md'), '正本のパスが含まれていない');
+  assert.ok(out.includes('SKILL.md'), '規約の全文のパスが含まれていない');
   assert.ok(out.includes('anchor.md'), '要約のパスが含まれていない');
 });
 

@@ -26,7 +26,7 @@ const lines = [
   '',
   '上記に該当する文章を書く前に、tired-dev:tech-writing の規約を読んでから書く。',
   'gh pr create と gh pr edit のタイトルと本文は、投稿の直前にフックが規約違反を検査し、違反があれば投稿を止める。',
-  `規約の正本: ${path.join(ROOT, 'SKILL.md')}`,
+  `規約の全文: ${path.join(ROOT, 'SKILL.md')}`,
   `要約: ${path.join(ROOT, 'rules', 'anchor.md')}`,
 ];
 
