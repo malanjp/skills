@@ -8,9 +8,8 @@ description: 疲れたエンジニアが一読で理解できる日本語の技�
 このパッケージは Cursor 用の `tired-dev-cursor` である。
 Claude Code 用の `tired-dev` ではない。
 
-規約の正本は Claude Code 用の [`../tired-dev/SKILL.md`](../../../tired-dev/SKILL.md) である。
-このパッケージの [`SKILL.md`](../../SKILL.md) は正本と同一に保つ。
-直ちに正本を開き、その規約に従って書く。
+直ちにこのパッケージの [`SKILL.md`](../../SKILL.md) を開き、その規約に従って書く。
+この本文は、リポジトリで管理する `tired-dev/SKILL.md` と同一に保つ。
 
 要約は [`rules/anchor.mdc`](../../rules/anchor.mdc) にある。
 チャット返答へ語彙だけを適用する任意ルールは [`rules/chat.mdc`](../../rules/chat.mdc) にある。
