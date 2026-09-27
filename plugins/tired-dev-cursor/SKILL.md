@@ -1,6 +1,6 @@
 ---
 name: tech-writing
-description: 疲れたエンジニアが一読で理解できる日本語の技術文書を書くための規約です。報告、Issue、PR、レビュー指摘、調査結果、設計書、docs/ 配下の推敲に適用します。You MUST invoke this skill BEFORE writing or editing any Japanese text longer than 3 sentences that will be shared with humans (Linear issues/comments, GitHub PRs/reviews, design docs, README, reports). 推敲や校正の依頼（「推敲して」「読みやすくして」proofread / rewrite in Japanese）でも参照してください。です・ます調で書き、結論を冒頭に置きます。見出しを具体的にし、事実と仮説を分離し、必要な検証手順と完了条件を添えます。短い返答、単文の確認質問、コード出力には不要です。エッセイ等の非技術文には適用しません。
+description: 疲れたエンジニアが一読で理解できる日本語の技術文書を書くための規約です。報告、Issue、PR、レビュー指摘、調査結果、設計書、docs/ 配下の推敲に適用します。You MUST invoke this skill BEFORE writing or editing any Japanese text longer than 3 sentences that will be shared with humans (Linear issues/comments, GitHub PRs/reviews, design docs, README, reports). 推敲や校正の依頼（「推敲して」「読みやすくして」proofread / rewrite in Japanese）でも参照してください。リポジトリのテンプレートを優先し、各欄の説明に適用します。です・ます調で書き、結論は目的や概要の欄の冒頭に置きます。テンプレートがない場合は本文の冒頭に置きます。見出しを具体的にし、事実と仮説を分離し、必要な検証手順と完了条件を添えます。短い返答、単文の確認質問、コード出力には不要です。エッセイ等の非技術文には適用しません。
 ---
 
 # 報告・タスク記述・技術文章の規約 (Engineering Communication Standard)
@@ -11,6 +11,18 @@ description: 疲れたエンジニアが一読で理解できる日本語の技�
 緩急や語りを設計する規約と同時に指示された場合は、文書の種類で使い分け、技術報告には本規約を優先します。
 
 ---
+
+## リポジトリのテンプレートを優先します
+
+作成・推敲の前に、リポジトリの指示と対象文書のテンプレートを確認します。
+PR は `.github/PULL_REQUEST_TEMPLATE*` や `.github/pull_request_template.md`、Issue は `.github/ISSUE_TEMPLATE/` など、指示された参照先を読みます。
+
+- 対象のテンプレートがある場合は、その見出し・項目・記載順・必須欄・固定文言を本規約より優先します。本規約に合わせて削除・改名・並べ替えをしません。
+- 本規約は、各欄に書く説明へ適用します。結論は目的や概要を記入する欄の冒頭に置き、事実と未確認事項を分け、必要な検証手順を添えます。
+- テンプレートが「無し」やチェックリストを求める場合は、その指定に従います。テンプレート由来の形式を規約違反として扱いません。
+- 対象のテンプレートがない場合は、本規約の構成例を使います。
+
+たとえば「チケットへのリンク」「目的」「やったこと」の順が指定されていれば、その順を守り、「目的」欄の冒頭で変更の目的を伝えます。
 
 ## 1. 情報設計・構造 (Information Architecture)
 
@@ -227,6 +239,7 @@ description: 疲れたエンジニアが一読で理解できる日本語の技�
 
 ## 7. 読者の目的に合わせたテンプレート
 
+この節の構成例は、リポジトリに対象のテンプレートがない場合に使います。
 まず読者が決めることを 1 つ定め、対応する型を選びます。
 型は説明の順序を示します。見出しの数や文章量を埋めるためのものではありません。
 

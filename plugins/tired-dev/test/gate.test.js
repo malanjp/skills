@@ -70,6 +70,11 @@ test('同一セッションの 2 回目はアンカー全文ではなくリマ�
   assert.ok(first.includes('アンカー'), '1 回目にアンカー全文が出ていない');
   assert.ok(!second.includes('アンカー'), '2 回目にアンカー全文が再掲された');
   assert.ok(second.includes('tech-writing'), '2 回目のリマインダにスキル名がない');
+  for (const output of [first, second]) {
+    assert.match(output, /リポジトリに対象のテンプレートがあれば/);
+    assert.match(output, /優先/);
+    assert.match(output, /各欄の説明/);
+  }
   assert.ok(second.length < first.length, '2 回目が 1 回目より短くなっていない');
 });
 
@@ -113,6 +118,7 @@ test('SessionStart は適用対象と規約の全文のパスを通知する', (
   const out = runHook('activate', {}, dir);
   assert.ok(out.startsWith('tired-dev:tech-writing 有効。'), '通知がスキル名から始まっていない');
   assert.ok(out.includes('SKILL.md'), '規約の全文のパスが含まれていない');
+  assert.match(out, /リポジトリに対象のテンプレートがあれば、その形式を優先/);
   assert.ok(out.includes('anchor.md'), '要約のパスが含まれていない');
 });
 

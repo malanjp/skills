@@ -99,6 +99,23 @@ test('違反がなければ何も出力しない', () => {
   assert.equal(denyReason(bash(`gh pr create --title "${GOOD_TITLE}" --body "${GOOD_BODY}"`)), null);
 });
 
+test('テンプレートの見出し順では止めず、各欄の語句は検査する', () => {
+  const body = [
+    '# 変更内容', '',
+    '## チケットへのリンク', '', '- https://example.com/issues/1', '',
+    '## 目的', '', '入力を共通スキーマで検証します。', '',
+    '## やったこと', '', '- 入力の検証を追加しました。', '',
+    '## やらないこと', '', '- 無し',
+  ].join('\n');
+  for (const action of ['create', 'edit 12']) {
+    const command = (text) => `gh pr ${action} --body-file - <<'EOF'\n${text}\nEOF`;
+    assert.equal(denyReason(bash(command(body))), null);
+    const reason = denyReason(bash(command(body.replace('共通スキーマ', '正典'))));
+    assert.match(reason, /\[jargon\]/);
+    assert.ok(!reason.includes('[bluf-missing]'));
+  }
+});
+
 test('parallel-style の違反だけでは投稿を止めない', () => {
   const body = '## 確認\n\n- 単体テストが通ることを確認した\n- lint の実行\n- 型検査が通る\n';
   assert.equal(denyReason(bash(`gh pr create --title "${GOOD_TITLE}" --body "${body}"`)), null);
