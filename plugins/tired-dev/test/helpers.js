@@ -21,7 +21,8 @@ function runHook(hookName, input, configDir, env = {}) {
     input: JSON.stringify(input),
     encoding: 'utf8',
     // TIRED_DEV_CHAT は呼び出し側の環境に左右させない。テストで明示的に渡す。
-    env: { ...process.env, TIRED_DEV_CHAT: '', CLAUDE_CONFIG_DIR: configDir, ...env },
+    // 読み手の検査は実際のモデルを呼ぶため、既定で無効にする。有効にするテストは偽のコマンドを渡す。
+    env: { ...process.env, TIRED_DEV_CHAT: '', TIRED_DEV_READER: 'off', CLAUDE_CONFIG_DIR: configDir, ...env },
   });
 }
 

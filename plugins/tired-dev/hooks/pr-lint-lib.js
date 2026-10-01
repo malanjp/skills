@@ -26,18 +26,23 @@ function lintPr({ title, body }) {
   return findings.filter((f) => !SKIP_RULES.has(f.rule));
 }
 
-function formatReason(findings) {
+// 指摘を 1 件 1 行にし、MAX_FINDINGS 件を超えた分は件数だけを書く。
+function findingLines(findings) {
   const shown = findings.slice(0, MAX_FINDINGS).map((f) => {
     const where = f.file === 'タイトル' ? 'タイトル' : `本文 ${f.line} 行目`;
     return `- ${where}: [${f.rule}] ${f.message} (${f.section}) — ${f.found}`;
   });
   const rest = findings.length - shown.length;
   if (rest > 0) shown.push(`- ほか ${rest} 件`);
+  return shown;
+}
+
+function formatReason(findings) {
   return [
     `tired-dev: PR のタイトルと本文に tech-writing 規約の違反が ${findings.length} 件ある。`,
     '直してから同じコマンドを実行し直す。',
     '',
-    ...shown,
+    ...findingLines(findings),
     '',
     '規約の全文は tired-dev:tech-writing スキルにある。',
     '誤検出だと判断した場合に限り、gh の直前に TIRED_DEV_PR_LINT=off を付けて実行し、',
@@ -57,4 +62,4 @@ function findPrFindings({ command, cwd, env = process.env } = {}) {
   return findings;
 }
 
-module.exports = { MAX_FINDINGS, SKIP_RULES, prLintDisabled, lintPr, formatReason, findPrFindings };
+module.exports = { MAX_FINDINGS, SKIP_RULES, prLintDisabled, lintPr, findingLines, formatReason, findPrFindings };
