@@ -22,6 +22,12 @@ test('語彙表の禁止語を検出する', () => {
   assert.deepEqual(lintText('「正本」は文脈に合わせて言い換えます。'), []);
   assert.ok(ruleIds('設定が全プロジェクトに効く。').includes('jargon'));
   assert.ok(ruleIds('フックを効かせる。').includes('jargon'));
+  assert.ok(ruleIds('設定が効いていない。').includes('jargon'));
+  assert.ok(ruleIds('版作成と有効化を通る。').includes('jargon'));
+  assert.ok(ruleIds('公開版の無いワークフロー。').includes('jargon'));
+  assert.deepEqual(lintText('公開済みのバージョンが無いワークフローです。'), []);
+  assert.ok(!ruleIds('書籍を出版する。').includes('jargon'));
+  assert.ok(!ruleIds('Cursor 版はフックを含みません。').includes('jargon'));
   assert.ok(ruleIds('包括的なテストを書く。').includes('jargon'));
   assert.ok(ruleIds('追補チケットを作成する。').includes('jargon'));
   assert.deepEqual(lintText('追加の対応チケットを作成する。'), []);
