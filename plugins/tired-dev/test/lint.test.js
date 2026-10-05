@@ -76,6 +76,35 @@ test('長い文を検出する', () => {
   assert.ok(!ruleIds('この処理は入力を検証してから保存する。').includes('long-sentence'));
 });
 
+test('節をつなぐ読点が 1 文に 3 個以上あれば検出する', () => {
+  assert.ok(
+    ruleIds('理由は、既に稼働しており、開発環境が整っているため、導入の作業が最も少ない。').includes('comma-chain'),
+  );
+  // 2 個までは許す。
+  assert.ok(!ruleIds('要件が実在する場合は、別キューに分け、専用のワーカーを割り当てる。').includes('comma-chain'));
+  // 名詞を並べる読点は数えない。
+  assert.ok(!ruleIds('メール、Slack、Web Push、テンプレート管理が同居する。').includes('comma-chain'));
+  assert.ok(!ruleIds('ルーティングのバグ、リトライの重複、両系統の稼働に備える。').includes('comma-chain'));
+  // 文が変われば数え直す。
+  assert.ok(!ruleIds('理由は、2 つある。稼働実績があり、開発環境が整っている。').includes('comma-chain'));
+});
+
+test('句点の後に同じ行で文を続けると検出する', () => {
+  assert.ok(ruleIds('一覧が空になります。原因は ID の変換です。').includes('one-sentence-per-line'));
+  assert.ok(ruleIds('- 入力を検証します。検証後に保存します。').includes('one-sentence-per-line'));
+  assert.ok(!ruleIds('一覧が空になります。\n原因は ID の変換です。').includes('one-sentence-per-line'));
+  // 句点の後の閉じかっこと、引用やコードの中の句点は対象外にする。
+  assert.ok(!ruleIds('(詳細は別紙に書きます。)').includes('one-sentence-per-line'));
+  assert.ok(!ruleIds('「A です。B です。」と書きます。').includes('one-sentence-per-line'));
+  assert.ok(!ruleIds('`echo 完了。終了` を実行します。').includes('one-sentence-per-line'));
+  assert.ok(!ruleIds('| 一覧が空です。原因は変換です。 |').includes('one-sentence-per-line'));
+});
+
+test('one-sentence-per-line は投稿を止めない', () => {
+  const { SKIP_RULES } = require('../hooks/pr-lint-lib');
+  assert.ok(SKIP_RULES.has('one-sentence-per-line'));
+});
+
 test('後方参照を検出する', () => {
   assert.ok(ruleIds('上記の関数で落ちる。').includes('back-reference'));
   assert.ok(ruleIds('前述のとおり再現する。').includes('back-reference'));

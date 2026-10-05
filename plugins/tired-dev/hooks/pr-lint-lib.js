@@ -13,7 +13,8 @@ const MAX_FINDINGS = 15;
 // 手動の `tools/lint.js` 実行でだけ使う。
 // bluf-missing は H1 の直後が見出しだと検出するが、リポジトリのテンプレートでも
 // この並びを使う。投稿本文だけでは指定された形式か判断できないため、投稿を止めない。
-const SKIP_RULES = new Set(['parallel-style', 'bluf-missing']);
+// one-sentence-per-line は規約の推奨であり、改行の違いだけで投稿を止めるほどの問題ではない。
+const SKIP_RULES = new Set(['parallel-style', 'bluf-missing', 'one-sentence-per-line']);
 
 function prLintDisabled(env = process.env) {
   return /^(off|0|false|no)$/i.test(String(env.TIRED_DEV_PR_LINT ?? '').trim());

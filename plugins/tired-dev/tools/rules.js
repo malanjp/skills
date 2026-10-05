@@ -88,6 +88,28 @@ const rules = [
     },
   },
   {
+    id: 'comma-chain',
+    section: '2-②',
+    message: '節をつなぐ読点が 1 文に 3 個以上ある。文を分けるか、並列する項目を箇条書きにする',
+    // 「稼働しており、」のように、ひらがなで終わる節の後の読点だけを数える。
+    // 「メール、Slack、」のような名詞の列挙は数えない。
+    test: (line) => {
+      const hits = [];
+      for (const sentence of splitSentences(line)) {
+        const clauses = sentence.split('、').slice(0, -1).filter((seg) => /[ぁ-ゟ]$/.test(seg));
+        if (clauses.length >= 3) hits.push(sentence.trim().slice(0, 24));
+      }
+      return hits;
+    },
+  },
+  {
+    id: 'one-sentence-per-line',
+    section: '2-②',
+    message: '句点の後に同じ行で文を続けない。改行して 1 行に 1 文を書く',
+    // 句点の直後に閉じかっこだけが続く場合は、文の続きではないため対象外にする。
+    test: (line) => matchAll(line, /。[\s)）]*[^\s)）]/g),
+  },
+  {
     id: 'arrow-note',
     section: '2-⑤',
     message: '矢印の走り書きをやめ、完全な文にする',
