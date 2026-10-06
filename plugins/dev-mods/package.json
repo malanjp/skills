@@ -1,6 +1,6 @@
 {
   "name": "dev-mods",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "malanjp が使う Claude Code の mod 集",
   "license": "MIT",

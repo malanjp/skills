@@ -9,9 +9,17 @@ type RawCheck = {
   state?: string
 }
 
+const CONTROL = /[\u0000-\u001f\u007f-\u009f]/g
+
+// PR タイトルやチェック名は他人が書けるので、端末の表示を書き換える ESC などの制御文字を除く。
+// 改行とタブは 1 行の表示を崩さないよう空白にする
+export function clean(s: string): string {
+  return s.replace(/[\t\n\r]/g, ' ').replace(CONTROL, '')
+}
+
 // gh pr view --json statusCheckRollup の 1 件を pass / fail / pending / skip に分類する
 export function classify(raw: RawCheck): Check {
-  const name = raw.name ?? raw.context ?? '(unknown)'
+  const name = clean(raw.name ?? raw.context ?? '(unknown)')
   // StatusContext (外部 CI) は state だけを持つ
   if (raw.__typename === 'StatusContext') {
     const s = raw.state ?? ''
@@ -56,7 +64,7 @@ export function parseGithubIssues(refs: unknown): GithubIssue[] {
   if (!Array.isArray(refs)) return []
   return refs.flatMap(r => {
     const { number, url } = r as { number?: unknown; url?: unknown }
-    return typeof number === 'number' && typeof url === 'string' ? [{ number, url }] : []
+    return typeof number === 'number' && typeof url === 'string' ? [{ number, url: clean(url) }] : []
   })
 }
 
@@ -69,9 +77,9 @@ export function parseLinearIssue(content: unknown): { title: string; url: string
     const j = JSON.parse(text.text) as { title?: unknown; url?: unknown; status?: unknown }
     if (typeof j.title !== 'string') return null
     return {
-      title: j.title,
-      url: typeof j.url === 'string' ? j.url : null,
-      status: typeof j.status === 'string' ? j.status : null,
+      title: clean(j.title),
+      url: typeof j.url === 'string' ? clean(j.url) : null,
+      status: typeof j.status === 'string' ? clean(j.status) : null,
     }
   } catch {
     return null

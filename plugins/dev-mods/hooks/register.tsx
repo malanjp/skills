@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { Check, LinearIssue, PrInfo } from '../types'
-import { extractLinear, parseChecks, parseGithubIssues, parseLinearIssue } from './parse'
+import { clean, extractLinear, parseChecks, parseGithubIssues, parseLinearIssue } from './parse'
 
 const PANE = 'pr-status'
 const POLL_MS = 10_000
@@ -45,7 +45,7 @@ async function fetchInfo($: EngineInterface): Promise<PrInfo> {
   const next: PrInfo = { branch: '', pr: null, checks: [], githubIssues: [], linearIssues: [], error: null, updatedAt: now }
   try {
     const b = await $.process.run(['git', 'branch', '--show-current'])
-    next.branch = b.exitCode === 0 ? b.stdout.trim() : '(git 外)'
+    next.branch = b.exitCode === 0 ? clean(b.stdout.trim()) : '(git 外)'
     let body = ''
     const r = await $.process.run(
       ['gh', 'pr', 'view', '--json', 'number,title,state,url,body,statusCheckRollup,closingIssuesReferences'],
@@ -53,7 +53,7 @@ async function fetchInfo($: EngineInterface): Promise<PrInfo> {
     )
     if (r.exitCode !== 0) {
       // PR が無いブランチは gh が非 0 で終わる。エラーではなく「PR なし」として表示する
-      if (!/no pull requests found/i.test(r.stderr)) next.error = r.stderr.trim().split('\n')[0] ?? 'gh 失敗'
+      if (!/no pull requests found/i.test(r.stderr)) next.error = clean(r.stderr.trim().split('\n')[0] ?? 'gh 失敗')
     } else {
       const j = JSON.parse(r.stdout) as {
         number: number
@@ -64,14 +64,14 @@ async function fetchInfo($: EngineInterface): Promise<PrInfo> {
         statusCheckRollup: unknown
         closingIssuesReferences: unknown
       }
-      next.pr = { number: j.number, title: j.title, state: j.state, url: j.url }
+      next.pr = { number: j.number, title: clean(j.title), state: clean(j.state), url: clean(j.url) }
       next.checks = parseChecks(j.statusCheckRollup)
       next.githubIssues = parseGithubIssues(j.closingIssuesReferences)
       body = j.body ?? ''
     }
     next.linearIssues = await Promise.all(extractLinear(next.branch, next.pr?.title ?? '', body).map(i => enrichLinear($, i)))
   } catch (err) {
-    next.error = err instanceof Error ? err.message : String(err)
+    next.error = clean(err instanceof Error ? err.message : String(err))
   }
   await update($, info, () => next)
   return next

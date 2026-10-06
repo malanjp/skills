@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'claude-code/testing'
 
-import { classify, extractLinear, parseGithubIssues, parseLinearIssue } from './parse'
+import { classify, clean, extractLinear, parseGithubIssues, parseLinearIssue } from './parse'
 
 const RUN = {
   command: 'pr-status',
@@ -25,7 +25,18 @@ const GH_JSON = JSON.stringify({
   ],
 })
 
+describe('clean', () => {
+  test('ESC や BEL などの制御文字を除き、改行とタブを空白にする', () => {
+    expect(clean('a\u001b[2Jb\u0007c\u009bd')).toBe('a[2Jbcd')
+    expect(clean('x\ny\tz')).toBe('x y z')
+  })
+})
+
 describe('classify', () => {
+  test('チェック名の制御文字を除く', () => {
+    expect(classify({ name: 'lint\u001b]0;evil\u0007', status: 'COMPLETED', conclusion: 'SUCCESS' }).name).toBe('lint]0;evil')
+  })
+
   test('CheckRun は完了前を pending、失敗系 conclusion を fail に分類する', () => {
     expect(classify({ name: 'a', status: 'QUEUED' }).result).toBe('pending')
     expect(classify({ name: 'a', status: 'COMPLETED', conclusion: 'TIMED_OUT' }).result).toBe('fail')
@@ -62,6 +73,10 @@ describe('parseLinearIssue', () => {
   test('JSON でない応答やタイトル無しは null', () => {
     expect(parseLinearIssue([{ type: 'text', text: 'Issue not found' }])).toBeNull()
     expect(parseLinearIssue([{ type: 'text', text: '{}' }])).toBeNull()
+  })
+  test('タイトルと状態の制御文字を除く', () => {
+    const content = [{ type: 'text', text: JSON.stringify({ title: 't\u001b[31m', url: null, status: 'Do\u001bne' }) }]
+    expect(parseLinearIssue(content)).toEqual({ title: 't[31m', url: null, status: 'Done' })
     expect(parseLinearIssue(undefined)).toBeNull()
   })
 })
@@ -107,5 +122,12 @@ describe('/pr-status', () => {
     )
     const { text } = await $.command.run(RUN)
     expect(text).toBe('取得失敗: gh auth login required')
+  })
+
+  test('gh のエラー文の制御文字を除いて返す', async ($, on) => {
+    on('ui.open', () => ({ value: { isPlaced: true } }))
+    on('process.run', async (_$, e) => (e.argv[0] === 'git' ? ok('main\n') : ng('bad\u001b[2J request')))
+    const { text } = await $.command.run(RUN)
+    expect(text).toBe('取得失敗: bad[2J request')
   })
 })
