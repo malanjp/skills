@@ -24,6 +24,26 @@
         "code-review",
         "cognitive-load"
       ]
+    },
+    {
+      "name": "dev-mods",
+      "source": "./plugins/dev-mods",
+      "description": "malanjp が使う Claude Code の mod 集。現在ブランチの PR と CI 状態をパネルに表示する pr-status を含む。",
+      "version": "0.1.0",
+      "author": {
+        "name": "malanjp",
+        "url": "https://github.com/malanjp"
+      },
+      "homepage": "https://github.com/malanjp/skills",
+      "license": "MIT",
+      "category": "productivity",
+      "keywords": [
+        "github",
+        "pull-request",
+        "ci",
+        "linear",
+        "pane"
+      ]
     }
   ]
 }

@@ -1,0 +1,11 @@
+{
+  "name": "dev-mods",
+  "version": "0.1.0",
+  "private": true,
+  "description": "malanjp が使う Claude Code の mod 集",
+  "license": "MIT",
+  "scripts": {
+    "test": "claude plugin test .",
+    "lint": "claude plugin validate ."
+  }
+}

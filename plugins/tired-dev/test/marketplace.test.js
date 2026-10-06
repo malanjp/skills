@@ -44,6 +44,13 @@ test('版番号は package.json とプラグインマニフェストとマーケ
       marketplace: ['.cursor-plugin', 'marketplace.json'],
       pluginName: 'tired-dev-cursor',
     },
+    {
+      label: 'Claude Code 用 dev-mods',
+      dir: path.join(REPO_ROOT, 'plugins', 'dev-mods'),
+      manifest: ['.claude-plugin', 'plugin.json'],
+      marketplace: ['.claude-plugin', 'marketplace.json'],
+      pluginName: 'dev-mods',
+    },
   ];
 
   for (const { label, dir, manifest, marketplace, pluginName } of cases) {

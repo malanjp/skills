@@ -8,6 +8,8 @@ importers:
 
   .: {}
 
+  plugins/dev-mods: {}
+
   plugins/tired-dev: {}
 
   plugins/tired-dev-cursor: {}
