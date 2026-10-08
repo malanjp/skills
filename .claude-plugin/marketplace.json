@@ -28,8 +28,8 @@
     {
       "name": "dev-mods",
       "source": "./plugins/dev-mods",
-      "description": "malanjp が使う Claude Code の mod 集。現在ブランチの PR と CI 状態をパネルに表示する pr-status を含む。",
-      "version": "0.1.1",
+      "description": "malanjp が使う Claude Code の mod 集。現在ブランチの PR と CI 状態をパネルに表示する pr-status と、セッション内で起動した開発サーバを一覧表示する dev-servers を含む。",
+      "version": "0.2.0",
       "author": {
         "name": "malanjp",
         "url": "https://github.com/malanjp"
@@ -42,7 +42,8 @@
         "pull-request",
         "ci",
         "linear",
-        "pane"
+        "pane",
+        "dev-server"
       ]
     }
   ]

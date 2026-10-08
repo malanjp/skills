@@ -1,14 +1,14 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
-import type { Check, LinearIssue, PrInfo } from '../types'
+import type { DevServerInfo, LinearIssue, PrInfo } from '../types'
 import { clean, extractLinear, parseChecks, parseGithubIssues, parseLinearIssue } from './parse'
+import { bashDescendants, parseLsof, parsePs, statusText, summarize, toServers } from './servers'
+import { devServersView, prStatusView } from './views'
 
 const PANE = 'pr-status'
 const POLL_MS = 10_000
 const info = atom({ plugin: 'dev-mods', key: 'info' } as const, null)
-
-const ICON: Record<Check['result'], string> = { pass: '✓', fail: '✗', pending: '…', skip: '-' }
 
 const LINEAR_SERVER = 'claude.ai Linear'
 // Linear の状態は頻繁に変わらないので、10 秒ごとの更新で毎回 MCP を呼ばない
@@ -77,12 +77,71 @@ async function fetchInfo($: EngineInterface): Promise<PrInfo> {
   return next
 }
 
+const SERVERS_PANE = 'dev-servers'
+const SERVERS_TITLE = '開発サーバ'
+// バックグラウンド起動の直後はまだ待受していないことが多いので、少し待ってから取り直す
+const SETTLE_MS = 3_000
+const servers = atom({ plugin: 'dev-mods', key: 'servers' } as const, null)
+
+// エンジンの PID はセッション中に変わらない。モジュールの再読み込みで消えてよい
+let enginePid: number | null = null
+let serversInFlight: Promise<DevServerInfo> | null = null
+
+async function getEnginePid($: EngineInterface): Promise<number> {
+  if (enginePid !== null) return enginePid
+  // $.process.run が起動した子の親がエンジン本体になる
+  const r = await $.process.run(['sh', '-c', 'echo $PPID'])
+  const pid = Number(r.stdout.trim())
+  if (r.exitCode !== 0 || !Number.isInteger(pid) || pid <= 1) throw new Error('エンジンの PID を取得できません')
+  enginePid = pid
+  return pid
+}
+
+async function fetchServers($: EngineInterface): Promise<DevServerInfo> {
+  const next: DevServerInfo = { list: [], error: null, updatedAt: new Date().toLocaleTimeString('ja-JP') }
+  try {
+    const pid = await getEnginePid($)
+    const ps = await $.process.run(['ps', '-axo', 'pid=,ppid=,command='])
+    if (ps.exitCode !== 0) throw new Error(ps.stderr.trim() || 'ps 失敗')
+    const commands = bashDescendants(parsePs(ps.stdout), pid)
+    if (commands.size > 0) {
+      // -p で絞らないと全プロセスを走査して数秒かかる
+      const pids = [...commands.keys()].join(',')
+      const ls = await $.process.run(['lsof', '-nP', '-iTCP', '-sTCP:LISTEN', '-a', '-p', pids, '-Fpcn'])
+      // 待受が 1 件も無いときも lsof は 1 で終わるので、stderr があるときだけ失敗とする
+      if (ls.exitCode !== 0 && ls.stderr.trim()) throw new Error(ls.stderr.trim().split('\n')[0])
+      next.list = toServers(commands, parseLsof(ls.stdout))
+    }
+  } catch (err) {
+    next.error = clean(err instanceof Error ? err.message : String(err))
+  }
+  let before = 0
+  await update($, servers, old => {
+    before = old?.list.length ?? 0
+    return next
+  })
+  $.ui.status(statusText(next))
+  // 0 件から増えたときだけ開く。毎回開くと、閉じたパネルが何度も戻ってくる
+  if (before === 0 && next.list.length > 0) void $.ui.open({ id: SERVERS_PANE, title: SERVERS_TITLE })
+  return next
+}
+
+function refreshServers($: EngineInterface): Promise<DevServerInfo> {
+  serversInFlight ??= fetchServers($).finally(() => {
+    serversInFlight = null
+  })
+  return serversInFlight
+}
+
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     await $.command.register({ name: 'pr-status', description: 'PR と CI 状態のパネルを開いて更新する' })
     void $.ui.open({ id: PANE, title: 'PR / CI' })
     void refresh($).catch(() => undefined)
     $.clock.every(POLL_MS, () => void refresh($).catch(() => undefined))
+    await $.command.register({ name: 'dev-servers', description: 'このセッションで起動した開発サーバの一覧を開く' })
+    void refreshServers($).catch(() => undefined)
+    $.clock.every(POLL_MS, () => void refreshServers($).catch(() => undefined))
     return next(e)
   })
 
@@ -93,12 +152,13 @@ export const register: Register = on => {
     return { text: r.pr ? `#${r.pr.number} を更新しました` : `${r.branch} に PR はありません` }
   })
 
-  // push や gh 操作の直後は CI 状態が変わるので即時更新する
+  // push や gh 操作の直後は CI 状態が変わるので即時更新する。バックグラウンド起動ではサーバ一覧も取り直す
   on('tool.call', { tool: 'Bash' }, async ($, e, next) => {
     const ran = await next(e)
     try {
       const cmd = e.command
       if (/\bgit (push|checkout|switch)\b|\bgh pr\b/.test(cmd)) void refresh($).catch(() => undefined)
+      if (e.run_in_background) $.clock.after(SETTLE_MS, () => void refreshServers($).catch(() => undefined))
     } catch {
       // パネル更新の失敗でツール結果を壊さない
     }
@@ -106,55 +166,28 @@ export const register: Register = on => {
   })
 
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
-    const { Box, Text, Link } = $.ui.resolve(e)
+    const ui = $.ui.resolve(e)
     const v = await read($, info)
-    if (!v) return <Text dimColor>読み込み中…</Text>
+    if (!v) return <ui.Text dimColor>読み込み中…</ui.Text>
+    return prStatusView(ui, v, e.viewport?.rows ?? 24)
+  })
 
-    const count = (k: Check['result']) => v.checks.filter(c => c.result === k).length
-    const failed = v.checks.filter(c => c.result === 'fail')
-    const pending = v.checks.filter(c => c.result === 'pending')
-    const room = Math.max(1, (e.viewport?.rows ?? 24) - 8)
+  on('command.run', { command: 'dev-servers' }, async $ => {
+    await $.ui.open({ id: SERVERS_PANE, title: SERVERS_TITLE })
+    return { text: summarize(await refreshServers($)) }
+  })
 
-    return (
-      <Box flexDirection="column">
-        <Text dimColor>branch: {v.branch}</Text>
-        {v.linearIssues.length > 0 && (
-          <Box flexDirection="column">
-            {v.linearIssues.map(i => (
-              <Text>
-                {i.url ? <Link href={i.url} label={i.id} /> : i.id}
-                {i.status && <Text color="cyan"> [{i.status}]</Text>}
-                {i.title && <Text dimColor> {i.title}</Text>}
-              </Text>
-            ))}
-          </Box>
-        )}
-        {v.githubIssues.length > 0 && (
-          <Text>
-            Issue: {v.githubIssues.map(i => <Link href={i.url} label={`#${i.number} `} />)}
-          </Text>
-        )}
-        {v.error && <Text color="red">エラー: {v.error}</Text>}
-        {!v.error && !v.pr && <Text dimColor>PR なし</Text>}
-        {v.pr && (
-          <Box flexDirection="column">
-            <Text bold>
-              #{v.pr.number} [{v.pr.state}]
-            </Text>
-            <Text>{v.pr.title}</Text>
-            <Text>
-              <Text color="green">✓{count('pass')}</Text> <Text color="red">✗{count('fail')}</Text>{' '}
-              <Text color="yellow">…{count('pending')}</Text> <Text dimColor>-{count('skip')}</Text>
-            </Text>
-            {[...failed, ...pending].slice(0, room).map(c => (
-              <Text color={c.result === 'fail' ? 'red' : 'yellow'}>
-                {ICON[c.result]} {c.name}
-              </Text>
-            ))}
-          </Box>
-        )}
-        <Text dimColor>更新 {v.updatedAt}</Text>
-      </Box>
-    )
+  // サーバを止めたら一覧からすぐ消す
+  on('tool.call', { tool: 'TaskStop' }, async ($, e, next) => {
+    const ran = await next(e)
+    void refreshServers($).catch(() => undefined)
+    return ran
+  })
+
+  on('ui.render', { component: 'Pane', requestId: SERVERS_PANE }, async ($, e) => {
+    const ui = $.ui.resolve(e)
+    const v = await read($, servers)
+    if (!v) return <ui.Text dimColor>読み込み中…</ui.Text>
+    return devServersView(ui, v)
   })
 }

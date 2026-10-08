@@ -1,7 +1,7 @@
 {
   "name": "dev-mods",
-  "version": "0.1.1",
-  "description": "malanjp が使う Claude Code の mod 集です。今は、作業中のブランチの PR と CI 状態、関連する GitHub Issue と Linear Issue をパネルに表示する pr-status を含みます。",
+  "version": "0.2.0",
+  "description": "malanjp が使う Claude Code の mod 集です。作業中のブランチの PR と CI 状態をパネルに表示する pr-status と、セッション内で起動した開発サーバを一覧表示する dev-servers を含みます。",
   "author": {
     "name": "malanjp",
     "url": "https://github.com/malanjp"
