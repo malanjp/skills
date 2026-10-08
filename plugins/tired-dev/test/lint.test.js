@@ -40,6 +40,9 @@ test('語彙表の禁止語を検出する', () => {
   assert.ok(ruleIds('定義元へ寄せる。').includes('jargon'));
   assert.ok(ruleIds('レコードを流し直す。').includes('jargon'));
   assert.ok(ruleIds('保存形を変換する。').includes('jargon'));
+  assert.ok(ruleIds('保存形を変換する。').includes('jargon'));
+  assert.ok(ruleIds('死にコードを削除する。').includes('jargon'));
+  assert.deepEqual(lintText('デッドコードを削除する。'), []);
   assert.deepEqual(lintText('透過PNGの画像を置く。'), []);
   assert.deepEqual(lintText('画像の透過性を確認する。'), []);
   assert.deepEqual(lintText('共通の定義を参照する。'), []);
