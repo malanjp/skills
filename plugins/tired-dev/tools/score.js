@@ -47,7 +47,7 @@ const checks = {
   },
   'out-of-scope': {
     label: 'スコープ外の明示',
-    test: (text) => /スコープ外|Out of Scope|対象外|やらないこと|今回は対応しない/.test(text),
+    test: (text) => /スコープ外|Out of Scope|対象外|やらないこと|今回は対応しない|(?:対応|変更)しません/.test(text),
   },
   'fact-vs-hypothesis': {
     label: '事実と仮説の分離',

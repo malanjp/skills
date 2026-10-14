@@ -65,6 +65,17 @@ function writeCoverage(rows) {
   }
 }
 
+// 規約が文章を膨らませていないかを見る。要素の充足が同じなら短いほうがよい。
+function writeLength(rows) {
+  process.stdout.write('\n文字数 (中央値と最小 - 最大。要素の充足が同じなら少ないほど簡潔)\n\n');
+  process.stdout.write('| 課題 | 規約なし | 規約あり |\n|---|---|---|\n');
+  for (const row of rows) {
+    const a = row['without-rules'].map((r) => r.chars);
+    const b = row['with-rules'].map((r) => r.chars);
+    process.stdout.write(`| ${row.id} | ${spread(a)} | ${spread(b)} |\n`);
+  }
+}
+
 // 要素ごとに、何回の試行で出現したかを数える。
 // 毎回出る要素と、たまたま 1 回出ただけの要素を区別する。
 function writeElementStability(rows, runs) {
@@ -123,6 +134,7 @@ function report(rows, runs = 1) {
   process.stdout.write(`\n課題 ${rows.length} 本、各条件 ${runs} 回の生成\n`);
   writeViolations(rows);
   writeCoverage(rows);
+  writeLength(rows);
   writeElementStability(rows, runs);
   writeRuleBreakdown(rows);
 }
