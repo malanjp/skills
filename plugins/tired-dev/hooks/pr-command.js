@@ -101,6 +101,23 @@ function resolveValue(value, docs) {
   return value;
 }
 
+// gh pr edit のオプションのうち、次の語を値として取るもの。
+const VALUE_OPTIONS = new Set([
+  '--title', '-t', '--body', '-b', '--body-file', '-F', '--repo', '-R', '--base', '-B', '--milestone', '-m',
+  '--add-label', '--remove-label', '--add-reviewer', '--remove-reviewer',
+  '--add-assignee', '--remove-assignee', '--add-project', '--remove-project',
+]);
+
+// オプションとその値を除いた、最初の位置引数を返す。
+function firstPositional(args) {
+  for (let i = 0; i < args.length; i += 1) {
+    const a = args[i];
+    if (!a.startsWith('-')) return a;
+    if (!a.includes('=') && VALUE_OPTIONS.has(a)) i += 1;
+  }
+  return null;
+}
+
 function optionValue(args, longName, shortName) {
   for (let i = 0; i < args.length; i += 1) {
     const a = args[i];
@@ -128,7 +145,7 @@ function readBodyFile(file, cwd, vars) {
   }
 }
 
-// gh pr create / edit の呼び出しごとに { title, body, bypass } を返す。
+// gh pr create / edit の呼び出しごとに { title, body, bypass, sub, selector, repo, base } を返す。
 // 値を確定できない項目は null にする。
 function parsePrCommands(command, cwd) {
   if (typeof command !== 'string' || !/\bgh\b/.test(command)) return [];
@@ -180,7 +197,11 @@ function parsePrCommands(command, cwd) {
       body = written.has(key) ? written.get(key) : readBodyFile(rawFile, cwd, vars);
     }
     const title = rawTitle === null ? null : resolveValue(rawTitle, docs);
-    found.push({ title, body, bypass });
+    // 差分の取得 (change-lib.js) に使う。edit の位置引数は PR の番号か URL である。
+    const selector = sub === 'edit' ? firstPositional(args) : null;
+    const repo = optionValue(args, '--repo', '-R');
+    const base = optionValue(args, '--base', '-B');
+    found.push({ title, body, bypass, sub, selector, repo, base });
   }
   return found;
 }

@@ -5,20 +5,19 @@
 // この検査は造語を拾うために、コードも会話も見ていないモデルへ本文だけを渡す。
 // 19 件の過去の PR と Issue で測った結果は README の「読み手の検査」にある。
 //
-// 子プロセスの claude には利用者の設定、フック、MCP、ツールを読み込ませない。
-// 読み込ませると利用者の CLAUDE.md が混ざって「事情を知らない読み手」にならず、
-// このプラグインのフックが子プロセスでも動いて再帰する。
+// モデルの呼び出し方は model-lib.js にある。
 //
 // 検査の失敗では投稿を止めない。タイムアウトや出力の破損は指摘 0 件として扱う。
 
-const { spawnSync } = require('node:child_process');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { runModel } = require('./model-lib');
 
 const PROMPT_PATH = path.join(__dirname, 'reader-prompt.md');
-const DEFAULT_MODEL = 'opus';
+// 造語 4 語を入れた本文で 3 回ずつ比べ、Haiku と Sonnet はどちらも 4 語すべてを挙げた。
+const DEFAULT_MODEL = 'claude-haiku-5-5';
 const TIMEOUT_MS = 45_000;
 // これより短い本文は定型の PR (日次デプロイなど) なので読ませない。
 const MIN_LENGTH = 200;
@@ -53,36 +52,22 @@ function readerDisabled(env = process.env) {
 
 // 本文を読み手のモデルに渡し、medium 以上の指摘を返す。
 // TIRED_DEV_READER_CMD はテストで claude の代わりに使うコマンド。
-function runReader(text, env = process.env) {
+async function runReader(text, env = process.env) {
   if (readerDisabled(env) || !text || text.length < MIN_LENGTH) return [];
-  const cmd = env.TIRED_DEV_READER_CMD || 'claude';
-  const args = [
-    '-p', '--model', env.TIRED_DEV_READER_MODEL || DEFAULT_MODEL,
-    '--setting-sources', '', '--strict-mcp-config', '--tools', '', '--no-session-persistence',
-    '--output-format', 'json', '--json-schema', SCHEMA,
-    '--system-prompt', fs.readFileSync(PROMPT_PATH, 'utf8'),
-  ];
-  // cwd をリポジトリの外に置き、プロジェクトの CLAUDE.md を拾わせない。
-  const res = spawnSync(cmd, args, {
-    cwd: os.tmpdir(),
+  const out = await runModel({
+    cmd: env.TIRED_DEV_READER_CMD || 'claude',
+    model: env.TIRED_DEV_READER_MODEL || DEFAULT_MODEL,
+    systemPrompt: fs.readFileSync(PROMPT_PATH, 'utf8'),
+    schema: SCHEMA,
     input: `次の本文を読んでください。\n\n<document>\n${text}\n</document>`,
-    encoding: 'utf8',
-    timeout: Number(env.TIRED_DEV_READER_TIMEOUT_MS) || TIMEOUT_MS,
-    maxBuffer: 16 << 20,
+    timeoutMs: Number(env.TIRED_DEV_READER_TIMEOUT_MS) || TIMEOUT_MS,
     env,
   });
-  if (res.error || res.status !== 0) return [];
-  try {
-    const out = JSON.parse(res.stdout);
-    if (out.is_error) return [];
-    const findings = out.structured_output?.findings;
-    if (!Array.isArray(findings)) return [];
-    return findings
-      .filter((f) => f && typeof f.term === 'string' && KEPT_CONFIDENCE.has(f.confidence))
-      .slice(0, MAX_FINDINGS);
-  } catch {
-    return [];
-  }
+  const findings = out?.findings;
+  if (!Array.isArray(findings)) return [];
+  return findings
+    .filter((f) => f && typeof f.term === 'string' && KEPT_CONFIDENCE.has(f.confidence))
+    .slice(0, MAX_FINDINGS);
 }
 
 function formatReaderFindings(findings) {

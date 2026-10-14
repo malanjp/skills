@@ -2,7 +2,8 @@
 // tired-dev — PreToolUse フック (Linear の MCP ツール)
 //
 // Linear の Issue、コメント、ドキュメントを保存する直前に、本文を検査する。
-// 検査の内容は PR と同じで、語句の検査 (tools/lint.js) と読み手の検査 (reader-lib.js) を行う。
+// 検査の内容は PR と同じで、語句の検査 (tools/lint.js) と読み手の検査 (reader-lib.js) と規約のレビュー (review-lib.js) を行う。
+// Linear には差分が無いため、レビューは本文だけで行う。
 //
 // MCP サーバー名は接続方法ごとに違う (claude_ai_Linear、plugin_productivity_linear、UUID)。
 // plugin.json の matcher はツール名の末尾で絞り、ここではツールの引数の形で本文を取り出す。
@@ -45,7 +46,7 @@ function formatLint(findings) {
   ];
 }
 
-function main() {
+async function main() {
   const input = readInput();
   if (prLintDisabled()) return;
   const texts = extractTexts(input.tool_name, input.tool_input);
@@ -54,7 +55,7 @@ function main() {
   const lintFindings = texts
     .flatMap(([label, text]) => lintText(text, label))
     .filter((f) => !SKIP_RULES.has(f.rule));
-  const reason = reviewPost({
+  const reason = await reviewPost({
     sessionId: input.session_id,
     scope: 'linear',
     parts: texts.map(([, text]) => text),
@@ -76,11 +77,9 @@ function main() {
 }
 
 if (require.main === module) {
-  try {
-    main();
-  } catch {
+  main().catch(() => {
     // 検査の失敗で Linear への保存を止めない。
-  }
+  });
 }
 
 module.exports = { extractTexts };
