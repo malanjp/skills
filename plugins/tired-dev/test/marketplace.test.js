@@ -95,3 +95,17 @@ test('チェッカの節番号は SKILL.md の見出しに存在する', () => {
     assert.ok(headings.has(rule.section), `${rule.id} の参照先 ${rule.section} が SKILL.md にない`);
   }
 });
+
+test('要約の文字数の目安と型の数は SKILL.md と一致する', () => {
+  // 要約は起動時に注入されるため、数値がずれると本文と違う目安で書かれる。
+  const skill = fs.readFileSync(path.join(CLAUDE_DIR, 'SKILL.md'), 'utf8');
+  const anchor = fs.readFileSync(path.join(CLAUDE_DIR, 'rules', 'anchor.md'), 'utf8');
+  const ranges = (text) => new Set([...text.matchAll(/(\d[\d,]*〜\d[\d,]* 文字)/g)].map((m) => m[1]));
+
+  for (const range of ranges(anchor)) {
+    assert.ok(ranges(skill).has(range), `要約の ${range} が SKILL.md にない`);
+  }
+
+  const types = (skill.match(/^### 7-\d+ /gm) || []).length;
+  assert.ok(anchor.includes(`${types} つの型`), `要約の型の数が 7 章の ${types} と違う`);
+});
