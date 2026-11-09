@@ -23,9 +23,9 @@ const KANJI = '\\u4e00-\\u9fff';
 const rules = [
   {
     id: 'jargon',
-    section: '2-①',
+    section: '2-3',
     message: '抽象的な比喩や英語直訳を使わず、平易な語で書く',
-    // 語彙表 (規約 2-①) に挙げた語だけを見る。
+    // 語彙表 (規約 2-3) に挙げた語だけを見る。
     // 「効く」は動詞形だけを拾う。「効果」「効率」「有効」「無効」は別語である。
     // 「版」は version の訳として使う場合だけを拾う。「出版」「版権」などは別語である。
     // 「Cursor 版」のように製品名に続く「版」は提供形態を指すため対象外にする。
@@ -37,25 +37,25 @@ const rules = [
   },
   {
     id: 'vague-quantifier',
-    section: '3-①',
+    section: '3-1',
     message: '曖昧な数量詞を使わず、件数や割合で書く',
     test: (line) => matchAll(line, /多くの|大幅に|かなり|さまざまな|様々な|いくつかの|ある程度/g),
   },
   {
     id: 'vague-why',
-    section: '3-②',
+    section: '3-2',
     message: '抽象的な警告で止めず、どう壊れるかをメカニズムで書く',
     test: (line) => matchAll(line, /保守性が下がる|可読性が下がる|パフォーマンスに悪影響|品質が低下/g),
   },
   {
     id: 'kanji-run',
-    section: '5-⑤',
+    section: '5-5',
     message: '漢字が 6 文字以上続く複合語を分解する',
     test: (line) => matchAll(line, new RegExp(`[${KANJI}]{6,}`, 'g')),
   },
   {
     id: 'no-chain',
-    section: '5-⑤',
+    section: '5-5',
     // 規約の目安は「の」が 3 つ。並列の列挙も 3 つで引っかかるため、
     // 機械判定では 4 つ以上だけを違反とする。
     message: '「の」が 4 つ以上続く修飾を分解する',
@@ -63,19 +63,19 @@ const rules = [
   },
   {
     id: 'back-reference',
-    section: '5-③',
+    section: '5-3',
     message: '「上記」「前述」等を使わず、対象を再掲する',
     test: (line) => matchAll(line, /上記|下記|前述|後述|上述|先述|前掲/g),
   },
   {
     id: 'double-negative',
-    section: '5-⑦',
+    section: '5-7',
     message: '二重否定を肯定形に直す',
     test: (line) => matchAll(line, /ない(?:わけ|こと)ではない|なくはない|ないことはない|なくもない/g),
   },
   {
     id: 'long-sentence',
-    section: '2-②',
+    section: '2-1',
     message: '1 文が長い。「。」で切って 1 文 1 メッセージにする',
     // 規約の目安は 1 文 50〜60 文字。その 2 倍を超えたものだけを違反とし、
     // 列挙を含む文が毎回引っかかるのを避ける。
@@ -89,7 +89,7 @@ const rules = [
   },
   {
     id: 'comma-chain',
-    section: '2-②',
+    section: '2-1',
     message: '節をつなぐ読点が 1 文に 3 個以上ある。文を分けるか、並列する項目を箇条書きにする',
     // 「稼働しており、」のように、ひらがなで終わる節の後の読点だけを数える。
     // 「メール、Slack、」のような名詞の列挙は数えない。
@@ -104,14 +104,14 @@ const rules = [
   },
   {
     id: 'one-sentence-per-line',
-    section: '2-②',
+    section: '2-1',
     message: '句点の後に同じ行で文を続けない。改行して 1 行に 1 文を書く',
     // 句点の直後に閉じかっこだけが続く場合は、文の続きではないため対象外にする。
     test: (line) => matchAll(line, /。[\s)）]*[^\s)）]/g),
   },
   {
     id: 'arrow-note',
-    section: '2-⑤',
+    section: '2-4',
     message: '矢印の走り書きをやめ、完全な文にする',
     test: (line) => matchAll(line, /[^\s`]+\.[a-z]{2,4}(?::\d+)?\s*[←→]/g),
   },
@@ -121,7 +121,7 @@ const rules = [
 const documentRules = [
   {
     id: 'parallel-style',
-    section: '5-⑥',
+    section: '5-6',
     message: '並列する項目で体言止めと文末止めを混ぜない',
     test: (lines) => {
       const hits = [];
@@ -141,7 +141,7 @@ const documentRules = [
   },
   {
     id: 'list-depth',
-    section: '1-③',
+    section: '1-8',
     message: '箇条書きのネストは 2 階層まで',
     test: (lines) => {
       const hits = [];
@@ -155,7 +155,7 @@ const documentRules = [
   },
   {
     id: 'conjunction-chain',
-    section: '5-⑧',
+    section: '5-8',
     message: '接続詞で 3 つ以上続けてつながない。見出しかテーブルに昇格させる',
     test: (lines) => {
       const hits = [];
@@ -176,7 +176,7 @@ const documentRules = [
   },
   {
     id: 'bluf-missing',
-    section: '1-①',
+    section: '1-1',
     message: '冒頭に結論を置く。H1 の直後 3 行以内に本文がない',
     test: (lines) => {
       const body = lines.filter((l) => !l.inCode);
@@ -196,7 +196,7 @@ function matchAll(line, re) {
 }
 
 // 「**事実**: 〜」のように、ラベルと値を並べた項目を見分ける。
-// 規約 1-④ が求める情報種別の分離はこの形になるため、文末の統一は求めない。
+// 規約 1-3 が求める情報種別の分離はこの形になるため、文末の統一は求めない。
 const LABELLED = /^\*\*[^*]+\*\*\s*[:：]/;
 
 // 同じインデント幅で続く箇条書きを 1 つの並びとして取り出す。

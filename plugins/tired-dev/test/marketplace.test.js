@@ -76,3 +76,22 @@ test('スキル説明文は管理元の SKILL.md と各入口で一致する', (
     assert.equal(frontmatterField(entry, 'description'), canonical, `${entry} の description が管理元と違う`);
   }
 });
+
+test('スキル本文は管理元と Cursor 版で一致する', () => {
+  // 2 つのパッケージは同じ規約の本文を収録する。片方だけ直すと、導入先で内容が変わる。
+  const body = (file) => fs.readFileSync(file, 'utf8').replace(/^---\n[\s\S]*?\n---\n/, '');
+  const canonical = body(path.join(CLAUDE_DIR, 'SKILL.md'));
+
+  assert.equal(body(path.join(CURSOR_DIR, 'SKILL.md')), canonical, 'Cursor 版の本文が管理元と違う');
+});
+
+test('チェッカの節番号は SKILL.md の見出しに存在する', () => {
+  // 節を組み替えたときに、違反メッセージが存在しない節を指すのを防ぐ。
+  const skill = fs.readFileSync(path.join(CLAUDE_DIR, 'SKILL.md'), 'utf8');
+  const headings = new Set([...skill.matchAll(/^### (\d+-\d+) /gm)].map((m) => m[1]));
+  const { rules, documentRules } = require(path.join(CLAUDE_DIR, 'tools', 'rules'));
+
+  for (const rule of [...rules, ...documentRules]) {
+    assert.ok(headings.has(rule.section), `${rule.id} の参照先 ${rule.section} が SKILL.md にない`);
+  }
+});
