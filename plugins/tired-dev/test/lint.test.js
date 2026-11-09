@@ -56,8 +56,20 @@ test('抽象的な警告を検出する', () => {
 });
 
 test('規約にない項目は検出しない', () => {
-  // 全角かっこは CLAUDE.md の表記ルールであって、規約 (SKILL.md) の規則ではない。
-  assert.deepEqual(lintText('対象は 3 件（未確認）である。'), []);
+  // 規約にない表記や語は、違反にしない。
+  assert.deepEqual(lintText('対象は 3 件で、担当者は未定である。'), []);
+});
+
+test('全角の丸括弧を検出する', () => {
+  assert.ok(ruleIds('対象は 3 件（未確認）である。').includes('fullwidth-paren'));
+  assert.deepEqual(lintText('対象は 3 件 (未確認) である。'), []);
+});
+
+test('比喩の動詞を検出する', () => {
+  assert.ok(ruleIds('失敗した処理を再試行に回す。').includes('jargon'));
+  assert.ok(ruleIds('設定を実装に落とし込む。').includes('jargon'));
+  assert.ok(ruleIds('関係者と仕様を擦り合わせる。').includes('jargon'));
+  assert.deepEqual(lintText('失敗した処理を再試行する。'), []);
 });
 
 test('漢字の連結を検出する', () => {
