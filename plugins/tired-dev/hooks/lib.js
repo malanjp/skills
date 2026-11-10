@@ -40,4 +40,11 @@ function chatGateEnabled(env = process.env) {
   return ['1', 'on', 'true', 'yes'].includes(value);
 }
 
-module.exports = { ROOT, ANCHOR_PATH, readInput, readRule, readAnchor, chatGateEnabled };
+// 応答を日本語に保つ Stop と SessionStart のフックを動かすかどうか。
+// 既定は有効で、環境変数を明示的に無効な値にしたときだけ止める。
+function jaOutputDisabled(env = process.env) {
+  const value = String(env.TIRED_DEV_JA_OUTPUT ?? '').trim().toLowerCase();
+  return ['0', 'off', 'false', 'no'].includes(value);
+}
+
+module.exports = { ROOT, ANCHOR_PATH, readInput, readRule, readAnchor, chatGateEnabled, jaOutputDisabled };

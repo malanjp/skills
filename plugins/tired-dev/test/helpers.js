@@ -25,6 +25,7 @@ function runHook(hookName, input, configDir, env = {}) {
     env: {
       ...process.env,
       TIRED_DEV_CHAT: '',
+      TIRED_DEV_JA_OUTPUT: '',
       TIRED_DEV_READER: 'off',
       TIRED_DEV_REVIEW: 'off',
       CLAUDE_CONFIG_DIR: configDir,
