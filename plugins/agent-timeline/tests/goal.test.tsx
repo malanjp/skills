@@ -4,7 +4,7 @@ import { NOW, PANE, USAGE, command, engine } from './engine'
 
 const GOAL = 'タイムライン mod に目的の表示を足す'
 
-test('the prompts are summed up as the session goal at the top of the pane', async ($, on) => {
+test('the first prompt is summed up as the session goal, and later prompts keep it', async ($, on) => {
   mock.clock(on)
   engine(on)
   const prompts: string[] = []
@@ -16,6 +16,8 @@ test('the prompts are summed up as the session goal at the top of the pane', asy
   await $.turn.start({ text: '目的を表示したい', turnId: 't1' })
   // A notice the app sends is not an instruction: no new summary.
   await $.turn.start({ text: '<task-notification>x</task-notification>', turnId: 't2' })
+  // Once set, a later prompt does not rewrite the goal.
+  await $.turn.start({ text: '別の作業もして', turnId: 't3' })
 
   expect(prompts.length).toBe(1)
   expect(prompts[0]).toContain('1. 目的を表示したい')
@@ -26,7 +28,7 @@ test('the prompts are summed up as the session goal at the top of the pane', asy
   await pane.unmount()
 })
 
-test('a goal the person writes stays until they hand it back', async ($, on) => {
+test('the person rewrites the goal, or has it summed up again', async ($, on) => {
   mock.clock(on)
   engine(on)
   let calls = 0

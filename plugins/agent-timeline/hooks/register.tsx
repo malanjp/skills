@@ -1,7 +1,7 @@
 import type { Register } from 'claude-code'
 
 import { answered, asText, ended, isInstruction, planned, prompted, started, titled, waiting, withPrs, wrapped } from './board'
-import { setGoal, updateGoal } from './goal'
+import { initGoal, setGoal } from './goal'
 import type { PlanArgs } from './plan'
 import { reportNow, runReports } from './reports'
 import {
@@ -69,7 +69,7 @@ export const register: Register = on => {
     currentTurn = e.turnId
     const at = await $.clock.now()
     await change($, b => prompted(b, e.text, at))
-    if (isInstruction(e.text)) void updateGoal($)
+    if (isInstruction(e.text)) void initGoal($)
     return next(e)
   })
 

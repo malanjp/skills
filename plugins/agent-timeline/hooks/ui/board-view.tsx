@@ -90,7 +90,7 @@ export function BoardView({ ui, board, place, toggleKey, onToggle }: Props) {
     <Box flexDirection="column" gap={1} paddingX={1}>
       <Section ui={ui} title="このセッションの目的" note={goalNote(board)}>
         {board.goal === undefined ? (
-          <Text dimColor>指示が来ると自動でまとめます。/timeline goal で自分で書けます。</Text>
+          <Text dimColor>最初の指示から自動でまとめます。/timeline goal で書き換えます。</Text>
         ) : (
           <Text bold>{board.goal.text}</Text>
         )}

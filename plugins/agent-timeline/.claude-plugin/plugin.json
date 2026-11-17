@@ -1,6 +1,6 @@
 {
   "name": "agent-timeline",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "このセッションの目的、計画の進捗、定期レポート、子セッションの状況をパネルとプロンプトの上の帯に表示する mod です。",
   "author": {
     "name": "malanjp",
