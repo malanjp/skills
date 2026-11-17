@@ -38,7 +38,7 @@ test('the person rewrites the goal, or has it summed up again', async ($, on) =>
   })
   await $.session.start({ cwd: '/work', surface: 'desktop', isInteractive: true })
 
-  const set = await $.command.run(command('goal 自分で書いた 目的'))
+  const set = await $.command.run(command('topic 自分で書いた 目的'))
   expect(set.text).toContain('自分で書いた 目的')
   await $.turn.start({ text: '別の指示', turnId: 't1' })
   expect(calls).toBe(0)
@@ -46,7 +46,7 @@ test('the person rewrites the goal, or has it summed up again', async ($, on) =>
   expect(await pane.find({ type: 'Text', text: /^自分で書いた 目的$/ })).toBeTruthy()
   expect(await pane.find({ type: 'Text', text: /^手動 · / })).toBeTruthy()
 
-  await $.command.run(command('goal'))
+  await $.command.run(command('topic'))
   expect(calls).toBe(1)
   expect(await pane.find({ type: 'Text', text: /^自動のまとめ$/ })).toBeTruthy()
   await pane.unmount()

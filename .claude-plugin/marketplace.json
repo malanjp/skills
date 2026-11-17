@@ -50,7 +50,7 @@
       "name": "agent-timeline",
       "source": "./plugins/agent-timeline",
       "description": "セッションの目的、計画の進捗、定期レポート、子セッションの状況をパネルとプロンプトの上の帯に表示する mod。",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "author": {
         "name": "malanjp",
         "url": "https://github.com/malanjp"

@@ -50,7 +50,7 @@ export type Board = {
   /** Per level, the end of the last interval reported on. */
   reportedTo: number[]
   changes: PlanChange[]
-  /** What this session is for: summed up from the prompts, or written with /timeline goal. */
+  /** What this session is for: summed up from the prompts, or written with /timeline topic. */
   goal?: Goal
 }
 

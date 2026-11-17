@@ -32,7 +32,7 @@ let isUpdating = false
 
 /**
  * Has haiku sum up the prompts as the goal. Without `isForced` it only fills a goal not set yet:
- * once set, the goal changes only when the person asks with /timeline goal.
+ * once set, the goal changes only when the person asks with /timeline topic.
  */
 async function summarize($: EngineInterface, isForced: boolean): Promise<void> {
   const b = await readBoard($)
@@ -59,7 +59,7 @@ export async function initGoal($: EngineInterface): Promise<void> {
   await summarize($, false)
 }
 
-/** `/timeline goal <text>` writes the goal; `/timeline goal` alone sums up the prompts so far again. */
+/** `/timeline topic <text>` writes the goal; `/timeline topic` alone sums up the prompts so far again. */
 export async function setGoal($: EngineInterface, text: string): Promise<string> {
   const at = await $.clock.now()
   if (text.trim() === '') {
