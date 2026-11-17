@@ -45,6 +45,26 @@
         "pane",
         "dev-server"
       ]
+    },
+    {
+      "name": "agent-timeline",
+      "source": "./plugins/agent-timeline",
+      "description": "セッションの目的、計画の進捗、定期レポート、子セッションの状況をパネルとプロンプトの上の帯に表示する mod。",
+      "version": "0.2.0",
+      "author": {
+        "name": "malanjp",
+        "url": "https://github.com/malanjp"
+      },
+      "homepage": "https://github.com/malanjp/skills",
+      "license": "MIT",
+      "category": "productivity",
+      "keywords": [
+        "timeline",
+        "progress",
+        "plan",
+        "pane",
+        "report"
+      ]
     }
   ]
 }

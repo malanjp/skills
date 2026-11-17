@@ -1,0 +1,11 @@
+{
+  "name": "agent-timeline",
+  "version": "0.2.0",
+  "private": true,
+  "description": "セッションの目的、計画の進捗、定期レポート、子セッションを表示する Claude Code の mod",
+  "license": "MIT",
+  "scripts": {
+    "test": "claude plugin test .",
+    "lint": "claude plugin validate ."
+  }
+}
