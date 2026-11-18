@@ -130,22 +130,41 @@ test('gh pr edit の PR 番号と --repo を取り出す', () => {
   assert.equal(create.base, 'develop');
 });
 
-test('規約のレビューは止めた回数に上限を設けず、本文が変わるたびに呼ぶ', () => {
+test('規約のレビューは投稿が通るまでに 1 回だけ止め、書き直した本文は通す', () => {
   const ctx = modelEnv({ review: output([SCOPE]) });
-  for (let i = 0; i < 4; i += 1) {
-    assert.match(denyReason('pr-lint', prInput(`${BODY}${i} 回目の追記です。\n`), ctx), /\[summary-scope\]/);
-  }
-  assert.equal(ctx.calls('review'), 4);
-  // レビューだけで止めた回数は、読み手の上限に数えない。
-  assert.equal(ctx.calls('reader'), 4);
+  const reason = denyReason('pr-lint', prInput(BODY), ctx);
+  assert.match(reason, /\[summary-scope\]/);
+  assert.match(reason, /書き直した本文では規約のレビューを省く/);
+  assert.equal(denyReason('pr-lint', prInput(`${BODY}書き直しました。\n`), ctx), null);
+  assert.equal(ctx.calls('review'), 1);
+  // 投稿が通った後の次の投稿は、改めてレビューする。
+  assert.match(denyReason('pr-lint', prInput(`${BODY}次の PR です。\n`), ctx), /\[summary-scope\]/);
+  assert.equal(ctx.calls('review'), 2);
 });
 
-test('読み手が上限に達した後も、規約のレビューは続ける', () => {
+test('規約のレビューの回数は、PR と Linear で別に数える', () => {
+  const ctx = modelEnv({ review: output([SCOPE]) });
+  assert.match(denyReason('pr-lint', prInput(BODY), ctx), /\[summary-scope\]/);
+  const reason = denyReason(
+    'linear-lint',
+    { tool_name: 'mcp__claude_ai_Linear__save_issue', tool_input: { title: '有効化の条件を直す', description: BODY } },
+    ctx
+  );
+  assert.match(reason, /\[summary-scope\]/);
+  assert.equal(ctx.calls('review'), 2);
+});
+
+test('読み手とレビュアーは、それぞれの上限まで止める', () => {
   const cas = { term: 'CAS 敗者', kind: 'coined', reason: '何に負けた側かが決まらない。', suggestion: '同時更新で失敗した側', confidence: 'medium' };
   const ctx = modelEnv({ reader: output([cas]), review: output([SCOPE]) });
-  for (let i = 0; i < 3; i += 1) denyReason('pr-lint', prInput(`${BODY}${i} 回目の追記です。\n`), ctx);
+  const post = (i) => denyReason('pr-lint', prInput(`${BODY}${i} 回目の追記です。\n`), ctx);
+  assert.match(post(0), /\[summary-scope\]/);
+  const second = post(1);
+  assert.match(second, /「CAS 敗者」/);
+  assert.doesNotMatch(second, /\[summary-scope\]/);
+  assert.equal(post(2), null);
   assert.equal(ctx.calls('reader'), 2);
-  assert.equal(ctx.calls('review'), 3);
+  assert.equal(ctx.calls('review'), 1);
 });
 
 test('200 文字未満の本文も規約のレビューに渡す', () => {
