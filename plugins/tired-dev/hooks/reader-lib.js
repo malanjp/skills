@@ -128,12 +128,14 @@ function stopCount(sessionId, scope, env = process.env) {
   }
 }
 
+// 記録できたときだけ true を返す。
 function addStop(sessionId, scope, env = process.env) {
   try {
     fs.mkdirSync(seenDir(env), { recursive: true });
     fs.writeFileSync(stopsFile(sessionId, scope, env), String(stopCount(sessionId, scope, env) + 1));
+    return true;
   } catch {
-    // 数えられなくても、同じ本文の再投稿は markSeen の記録で通る。
+    return false;
   }
 }
 

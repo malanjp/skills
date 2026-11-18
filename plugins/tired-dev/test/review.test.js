@@ -134,7 +134,7 @@ test('規約のレビューは投稿が通るまでに 1 回だけ止め、書�
   const ctx = modelEnv({ review: output([SCOPE]) });
   const reason = denyReason('pr-lint', prInput(BODY), ctx);
   assert.match(reason, /\[summary-scope\]/);
-  assert.match(reason, /書き直した本文では規約のレビューを省く/);
+  assert.match(reason, /書き直した本文では規約のレビューを省く。語句の検査は続け、読み手の検査は止めた回数が 2 回に達するまで続ける/);
   assert.equal(denyReason('pr-lint', prInput(`${BODY}書き直しました。\n`), ctx), null);
   assert.equal(ctx.calls('review'), 1);
   // 投稿が通った後の次の投稿は、改めてレビューする。

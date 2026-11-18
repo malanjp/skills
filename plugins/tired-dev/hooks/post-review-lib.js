@@ -68,8 +68,11 @@ async function reviewPost({ sessionId, scope, parts, lintFindings, lintLines, li
     }
   }
 
+  // 読み手の回数を数えられなくても、同じ本文の再投稿は markSeen の記録で通る。
   if (readerFindings.length > 0) addStop(sessionId, scope, env);
-  if (reviewFindings.length > 0) addStop(sessionId, reviewScope, env);
+  // レビューの回数を記録できないまま止めると、書き直した本文も再びレビューで止まる。
+  if (reviewFindings.length > 0 && !addStop(sessionId, reviewScope, env)) reviewFindings = [];
+  if (!lintStops && readerFindings.length + reviewFindings.length === 0) return null;
 
   const sections = [];
   if (lintStops) sections.push(lintLines.join('\n'));
@@ -89,7 +92,7 @@ async function reviewPost({ sessionId, scope, parts, lintFindings, lintLines, li
       [
         `tired-dev: 規約のレビュアーのモデルが、tech-writing 規約への違反を ${reviewFindings.length} 件挙げた。`,
         '指摘の箇所を直してから投稿し直す。',
-        '書き直した本文では規約のレビューを省く。読み手の検査と語句の検査は続ける。',
+        `書き直した本文では規約のレビューを省く。語句の検査は続け、読み手の検査は止めた回数が ${MAX_READER_STOPS} 回に達するまで続ける。`,
         '',
         ...formatReviewFindings(reviewFindings),
       ].join('\n')
