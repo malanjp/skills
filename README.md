@@ -6,6 +6,16 @@
 新しい文書の作成にも、既存の原稿の推敲にも使えます。
 [規約とテンプレート](plugins/tired-dev/SKILL.md)、[記入例](plugins/tired-dev/eval/template-examples.md)で、文章の組み立て方を確認できます。
 
+## 収録しているプラグイン
+
+| プラグイン | 内容 | Claude Code での導入 |
+|---|---|---|
+| `tired-dev` | 日本語の技術文書を書くための規約とスキル | `/plugin install tired-dev@malanjp` |
+| `dev-mods` | [PR と CI の状態](#pr-と-ci-の状態をパネルに表示します)と[開発サーバの一覧](#セッション内で起動した開発サーバを一覧表示します)をパネルに表示する mod 集 | `/plugin install dev-mods@malanjp` |
+| `agent-timeline` | [セッションの目的、計画の進捗、定期レポート、子セッションの状況](#セッションの進み具合をパネルに表示します)を表示する mod | `/plugin install agent-timeline@malanjp` |
+
+どれも、先に `/plugin marketplace add malanjp/skills` でマーケットプレイスを追加してから導入します。
+
 ## 使うエージェントに合わせて導入します
 
 文章の規約は共通です。
@@ -137,7 +147,7 @@ Claude Code のターミナルで次を実行して導入します。
 `/timeline report` を実行すると、その場で 15 分のレポートを 1 回作ります。
 
 各セッションは自分の状態を `~/.claude/agent-board/<セッション ID>.json` に書き、親セッションはこのフォルダを読んで子セッションを表示します。
-24 時間以上更新のないファイルは表示しません。
+最後の更新から 24 時間を過ぎたファイルは表示しません。
 
 ## 変更後にテストと規約チェックを実行します
 
