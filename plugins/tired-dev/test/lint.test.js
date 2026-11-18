@@ -30,6 +30,10 @@ test('語彙表の禁止語を検出する', () => {
   assert.ok(!ruleIds('Cursor 版はフックを含みません。').includes('jargon'));
   assert.ok(ruleIds('包括的なテストを書く。').includes('jargon'));
   assert.ok(ruleIds('追補チケットを作成する。').includes('jargon'));
+  assert.ok(ruleIds('実装を壊す変異 73 件を検出する。').includes('jargon'));
+  // 手法名の Mutation Test は対象外にする。
+  assert.ok(!ruleIds('Mutation Test を 73 件追加する。').includes('jargon'));
+  assert.deepEqual(lintText('「変異」は平易な語に置き換えます。'), []);
   assert.deepEqual(lintText('追加の対応チケットを作成する。'), []);
   assert.deepEqual(lintText('別途対応する課題として登録する。'), []);
   assert.deepEqual(lintText('「追補チケット」は使わない。'), []);
