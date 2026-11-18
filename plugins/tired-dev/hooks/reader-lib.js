@@ -111,15 +111,16 @@ function markSeen(key, env = process.env) {
   }
 }
 
-// 書き直した本文を読ませるたびに、読み手が別の語を挙げて止め続けることがある。
-// 同じセッションの同じ投稿先で読み手が止めた回数を数え、上限に達したら読み手の検査を省く。
+// 書き直した本文を読ませるたびに、モデルが別の指摘を挙げて止め続けることがある。
+// 同じセッションの同じ投稿先でモデルが止めた回数を数え、上限に達したらその検査を省く。
+// 読み手の回数は scope (pr、linear) で、規約のレビューの回数は review-pr のような scope で数える。
 const MAX_READER_STOPS = 2;
 
 function stopsFile(sessionId, scope, env) {
   return path.join(seenDir(env), `stops-${contentKey(sessionId, [scope])}`);
 }
 
-function readerStops(sessionId, scope, env = process.env) {
+function stopCount(sessionId, scope, env = process.env) {
   try {
     return Number(fs.readFileSync(stopsFile(sessionId, scope, env), 'utf8')) || 0;
   } catch {
@@ -127,18 +128,30 @@ function readerStops(sessionId, scope, env = process.env) {
   }
 }
 
-function addReaderStop(sessionId, scope, env = process.env) {
+// 記録できたときだけ true を返す。
+function addStop(sessionId, scope, env = process.env) {
   try {
-    fs.writeFileSync(stopsFile(sessionId, scope, env), String(readerStops(sessionId, scope, env) + 1));
+    fs.mkdirSync(seenDir(env), { recursive: true });
+    fs.writeFileSync(stopsFile(sessionId, scope, env), String(stopCount(sessionId, scope, env) + 1));
+    return true;
   } catch {
-    // 数えられなくても、同じ本文の再投稿は markSeen の記録で通る。
+    return false;
+  }
+}
+
+function clearStops(sessionId, scope, env = process.env) {
+  try {
+    fs.rmSync(stopsFile(sessionId, scope, env), { force: true });
+  } catch {
+    // 消せなくても、次の投稿で一度レビューを省くだけで済む。
   }
 }
 
 module.exports = {
   MAX_READER_STOPS,
-  readerStops,
-  addReaderStop,
+  stopCount,
+  addStop,
+  clearStops,
   MIN_LENGTH,
   readerDisabled,
   runReader,
